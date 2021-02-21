@@ -2,7 +2,6 @@ import psycopg2
 
 
 class User:
-    db = 'db/Utilizadores.xlsx'
 
     def __init__(self):
         self.reset()
@@ -22,6 +21,15 @@ class User:
         return psycopg2.connect(host=mydb.Host, database=mydb.Database, user=mydb.User, password=mydb.Password,
                                 sslmode='require')
 
+
+    def apagarusr(self):
+         ficheiro = self.herokudb()
+         db = ficheiro.cursor()
+         db.execute("drop table usr")
+         ficheiro.commit()
+         ficheiro.close()
+
+
     def gravar(self, login, email, password):
         ficheiro = self.herokudb()
         db = ficheiro.cursor()
@@ -31,6 +39,7 @@ class User:
         db.execute("INSERT INTO usr VALUES (DEFAULT, %s, %s, %s)", (login, email, self.code(password),))
         ficheiro.commit()
         ficheiro.close()
+
 
     def existe(self, login):
         try:
@@ -73,7 +82,7 @@ class User:
             valor = db.fetchall()
             ficheiro.close()
         except:
-            valor = None
+            valor = ""
         return valor
 
     @staticmethod
