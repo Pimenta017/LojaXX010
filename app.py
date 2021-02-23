@@ -1,14 +1,33 @@
 from flask import Flask, render_template, request, redirect
 from user import User
+from artigos import Artigos
 
 app = Flask(__name__)
 usr = User()
+art = Artigos()
+
+@app.route('/inserirA', methods=['GET', 'POST'])
+def inserirA():
+    if request.method == 'POST':
+        v1 = request.form['category']
+        v2 = request.form['brand']
+        v3 = request.form['description']
+        v4 = request.form['price']
+        art.inserirA(v1, v2, v3, v4)
+    erro = "Artigo inserido com sucesso"
+    return render_template('Artigos/inserirA.html', erro=erro, usr=usr, art=art)
 
 
 @app.route('/tabela')
 def tabela():
-    dados = usr.lista()
-    return render_template('Utilizadores/tabela.html', tabela=dados, max=len(dados), usr=usr)
+    title = "Lista de utilizadores"
+    return render_template('tabela.html', title=title, tabela=usr.lista, campos=usr.campos, usr=usr)
+
+
+@app.route('/consultarA')
+def consultarA():
+    title = "Lista de Artigos"
+    return render_template('tabela.html', title=title, tabela=art.lista, campos=art.campos, usr=usr)
 
 
 @app.route('/registo', methods=['GET', 'POST'])
