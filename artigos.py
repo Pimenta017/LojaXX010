@@ -53,10 +53,19 @@ class Artigos:
     def inserirA(self, category, brand, description, price):
         ficheiro = self.herokudb()
         db = ficheiro.cursor()
-        db.execute("CREATE TABLE IF NOT EXISTS artigos "
-                   "(id serial primary key, category text, brand text, description text, price numeric,"
-                   " reference text, ean text, stock int, created date, updated date)")
-        db.execute("INSERT INTO artigos VALUES (DEFAULT, %s, %s, %s,%s)", (category, brand, description, price,))
+
+        catId = self.existeC(category)
+        if not catId:
+            self.inserirC(category)
+            catId = self.existeC(category)
+        db.execute("INSERT INTO artigos VALUES (DEFAULT ,%s, %s, %s, %s)", (catId, brand, description, price,))
+        ficheiro.commit()
+        ficheiro.close()
+
+    def inserirC(self, category):
+        ficheiro = self.herokudb()
+        db = ficheiro.cursor()
+        db.execute("INSERT INTO categorias VALUES (DEFAULT ,%s)", (category,))
         ficheiro.commit()
         ficheiro.close()
 
@@ -78,11 +87,22 @@ class Artigos:
             erro = "A tabela não existe."
         return erro
 
-    def existe(self, artigos, login):
+    def existe(self, login):
         try:
             ficheiro = self.herokudb()
             db = ficheiro.cursor()
             db.execute("SELECT * FROM usr WHERE login = %s", (login,))
+            valor = db.fetchone()
+            ficheiro.close()
+        except:
+            valor = None
+        return valor
+
+    def existeC(self, category):
+        try:
+            ficheiro = self.herokudb()
+            db = ficheiro.cursor()
+            db.execute("SELECT id FROM categorias WHERE category = %s", (category,))
             valor = db.fetchone()
             ficheiro.close()
         except:
@@ -117,6 +137,18 @@ class Artigos:
             ficheiro = self.herokudb()
             db = ficheiro.cursor()
             db.execute("SELECT * FROM artigos")
+            valor = db.fetchall()
+            ficheiro.close()
+        except:
+            valor = ""
+        return valor
+
+    @property
+    def listaC(self):
+        try:
+            ficheiro = self.herokudb()
+            db = ficheiro.cursor()
+            db.execute("select category from categorias")
             valor = db.fetchall()
             ficheiro.close()
         except:
