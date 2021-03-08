@@ -17,6 +17,14 @@ class Artigos:
         self.stock = None  # Quantidade de artigos
         self.created = None  # Data de criação
         self.updated = None  # Data de alteração
+        ficheiro = self.herokudb()
+        db = ficheiro.cursor()
+        db.execute("CREATE TABLE IF NOT EXISTS categorias (id serial primary key, category text)")
+        db.execute("CREATE TABLE IF NOT EXISTS artigos (id serial primary key, category int, brand text,"
+                   "description text, price numeric, reference text, ean text, stock int, created date, updated date,"
+                   "CONSTRAINT fk_category foreign key (category) references categorias(id))")
+        ficheiro.commit()
+        ficheiro.close()
 
     def herokudb(self):
         from db import Database
@@ -31,7 +39,7 @@ class Artigos:
             db = ficheiro.cursor()
             db.execute("SELECT * FROM artigos WHERE id = %s", (id,))
             valor = db.fetchone()
-            ficheiro.close
+            ficheiro.close()
             self.id = valor[0]  # Número do produto
             self.category = valor[1]  # Categoria
             self.brand = valor[2]  # Marca
