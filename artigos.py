@@ -160,7 +160,8 @@ class Artigos:
         try:
             ficheiro = self.herokudb()
             db = ficheiro.cursor()
-            db.execute("SELECT * FROM artigos")
+            db.execute("SELECT artigos.id, c.category, m.brand, description,"
+                       "price from artigos join categorias c on artigos.category = c.id join marcas m on artigos.brand = m.id")
             valor = db.fetchall()
             ficheiro.close()
         except:
@@ -201,6 +202,7 @@ class Artigos:
             ficheiro.close()
         except:
             valor = ""
+        valor = [('numero',), ('categoria',), ('marca',), ('descrição',), ('preço',)]
         return valor
 
     @staticmethod
